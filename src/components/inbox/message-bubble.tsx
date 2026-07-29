@@ -20,6 +20,7 @@ import { ReplyQuote } from "./reply-quote";
 import { MessageReactions } from "./message-reactions";
 import { InteractivePreview } from "@/components/interactive/interactive-preview";
 import { useTranslations } from "next-intl";
+import { BASE_PATH } from "@/lib/base-path";
 
 interface MessageBubbleProps {
   message: Message;
@@ -67,7 +68,7 @@ function MediaImage({ url, alt }: { url: string; alt: string }) {
     // Proxy URLs need auth fetch to create blob URL
     if (url.startsWith("/api/whatsapp/media/")) {
       try {
-        const res = await fetch(url);
+        const res = await fetch(`${BASE_PATH}${url}`);
         if (!res.ok) throw new Error("Failed to load media");
         const blob = await res.blob();
         const blobUrl = URL.createObjectURL(blob);

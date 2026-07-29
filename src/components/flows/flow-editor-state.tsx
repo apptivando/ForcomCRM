@@ -53,6 +53,7 @@ import { useTranslations } from "next-intl";
 import { unlinkNodeReferences } from "@/lib/flows/edges";
 import type { FlowNodeRow, FlowRow } from "@/lib/flows/types";
 import { NODE_META, slugify, type BuilderNode, type NodeType } from "./shared";
+import { BASE_PATH } from "@/lib/base-path";
 
 // ============================================================
 // State shape
@@ -332,7 +333,7 @@ export function FlowEditorProvider({
   const save = useCallback(async () => {
     setSaving(true);
     try {
-      const res = await fetch(`/api/flows/${initialFlow.id}`, {
+      const res = await fetch(`${BASE_PATH}/api/flows/${initialFlow.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -373,7 +374,7 @@ export function FlowEditorProvider({
         if (next === "active") {
           await save();
         }
-        const res = await fetch(`/api/flows/${initialFlow.id}/activate`, {
+        const res = await fetch(`${BASE_PATH}/api/flows/${initialFlow.id}/activate`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ status: next }),
@@ -407,7 +408,7 @@ export function FlowEditorProvider({
     );
     if (!yes) return;
     try {
-      const res = await fetch(`/api/flows/${initialFlow.id}`, {
+      const res = await fetch(`${BASE_PATH}/api/flows/${initialFlow.id}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error(`Delete failed: ${res.status}`);

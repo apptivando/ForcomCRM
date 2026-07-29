@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Contact, MessageTemplate } from '@/types';
+import { BASE_PATH } from '@/lib/base-path';
 
 export type CustomFieldOperator = 'is' | 'is_not' | 'contains';
 
@@ -474,7 +475,7 @@ export function useBroadcastSending(): UseBroadcastSendingReturn {
         if (apiRecipients.length === 0) continue;
 
         try {
-          const res = await fetch('/api/whatsapp/broadcast', {
+          const res = await fetch(`${BASE_PATH}/api/whatsapp/broadcast`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

@@ -23,6 +23,7 @@ import { Skeleton } from '@/components/dashboard/skeleton';
 import { BarChart } from '@/components/tremor/bar-chart';
 import { formatCompactNumber } from '@/lib/currency';
 import { format, parseISO } from 'date-fns';
+import { BASE_PATH } from '@/lib/base-path';
 
 interface UsageResponse {
   window_days: number;
@@ -65,7 +66,7 @@ export function AiUsageCard() {
   const fetchUsage = useCallback(async (windowDays: number) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/ai/usage?days=${windowDays}`, {
+      const res = await fetch(`${BASE_PATH}/api/ai/usage?days=${windowDays}`, {
         cache: 'no-store',
       });
       const json = await res.json().catch(() => null);

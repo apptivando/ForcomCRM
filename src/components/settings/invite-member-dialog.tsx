@@ -38,6 +38,7 @@ import {
 } from '@/components/ui/select';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/hooks/use-auth';
+import { BASE_PATH } from '@/lib/base-path';
 
 type InviteRole = 'admin' | 'agent' | 'viewer';
 
@@ -105,7 +106,7 @@ export function InviteMemberDialog({
     }
     setSubmitting(true);
     try {
-      const res = await fetch('/api/account/invitations', {
+      const res = await fetch(`${BASE_PATH}/api/account/invitations`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

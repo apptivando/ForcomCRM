@@ -1,3 +1,5 @@
+import { BASE_PATH } from '@/lib/base-path';
+
 interface ContactTagMutationResult {
   added?: boolean;
   dispatched?: boolean;
@@ -9,7 +11,7 @@ async function mutateContactTag(
   tagId: string,
   method: 'POST' | 'DELETE'
 ): Promise<ContactTagMutationResult> {
-  const response = await fetch(`/api/contacts/${contactId}/tags`, {
+  const response = await fetch(`${BASE_PATH}/api/contacts/${contactId}/tags`, {
     method,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ tag_id: tagId }),

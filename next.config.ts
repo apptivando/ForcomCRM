@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
+import { BASE_PATH } from "./src/lib/base-path";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
@@ -70,7 +71,7 @@ const nextConfig: NextConfig = {
    * y las rutas de API de wacrm intentarían resolverse desde la raíz
    * del dominio y chocarían con las de forcom-web.
    */
-  basePath: "/admin/crm",
+  basePath: BASE_PATH,
 
   /**
    * Cross-origin dev access (Next.js 16).

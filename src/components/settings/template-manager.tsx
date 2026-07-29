@@ -48,6 +48,7 @@ import type {
   TemplateSampleValues,
 } from '@/types';
 import { templateStatusConfig } from '@/lib/template-status';
+import { BASE_PATH } from '@/lib/base-path';
 import {
   extractVariableIndices,
   TEMPLATE_LIMITS,
@@ -265,8 +266,8 @@ export function TemplateManager() {
       setSubmitting(true);
       const isEdit = editingId !== null;
       const url = isEdit
-        ? `/api/whatsapp/templates/${editingId}`
-        : '/api/whatsapp/templates/submit';
+        ? `${BASE_PATH}/api/whatsapp/templates/${editingId}`
+        : `${BASE_PATH}/api/whatsapp/templates/submit`;
       const res = await fetch(url, {
         method: isEdit ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -305,7 +306,7 @@ export function TemplateManager() {
     if (!user) return;
     setSyncing(true);
     try {
-      const res = await fetch('/api/whatsapp/templates/sync', { method: 'POST' });
+      const res = await fetch(`${BASE_PATH}/api/whatsapp/templates/sync`, { method: 'POST' });
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data?.error || `Sync failed (HTTP ${res.status})`);
@@ -351,7 +352,7 @@ export function TemplateManager() {
       // Route handler scopes the Meta delete via hsm_id (so sibling
       // language variants survive) and falls through to remove the
       // local row. Local-only rows skip the Meta call.
-      const res = await fetch(`/api/whatsapp/templates/${target.id}`, {
+      const res = await fetch(`${BASE_PATH}/api/whatsapp/templates/${target.id}`, {
         method: 'DELETE',
       });
       const data = await res.json().catch(() => ({}));

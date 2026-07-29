@@ -24,6 +24,7 @@ import {
   type InteractiveMessagePayload,
 } from "@/lib/whatsapp/interactive";
 import type { QuickReply, QuickReplyKind } from "@/types";
+import { BASE_PATH } from "@/lib/base-path";
 
 interface DraftState {
   id?: string;
@@ -51,7 +52,7 @@ export function QuickRepliesManager() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/quick-replies", { cache: "no-store" });
+      const res = await fetch(`${BASE_PATH}/api/quick-replies`, { cache: "no-store" });
       const data = await res.json().catch(() => ({}));
       if (res.ok) setItems((data.quick_replies as QuickReply[]) ?? []);
     } finally {
@@ -88,7 +89,7 @@ export function QuickRepliesManager() {
     setSaving(true);
     try {
       const res = await fetch(
-        draft.id ? `/api/quick-replies/${draft.id}` : "/api/quick-replies",
+        draft.id ? `${BASE_PATH}/api/quick-replies/${draft.id}` : `${BASE_PATH}/api/quick-replies`,
         {
           method: draft.id ? "PATCH" : "POST",
           headers: { "Content-Type": "application/json" },
@@ -113,7 +114,7 @@ export function QuickRepliesManager() {
   const remove = useCallback(
     async (id: string) => {
       if (!window.confirm("Delete this quick reply?")) return;
-      const res = await fetch(`/api/quick-replies/${id}`, { method: "DELETE" });
+      const res = await fetch(`${BASE_PATH}/api/quick-replies/${id}`, { method: "DELETE" });
       if (!res.ok) {
         toast.error("Couldn't delete the quick reply.");
         return;

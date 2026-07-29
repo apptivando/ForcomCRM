@@ -49,6 +49,7 @@ import { cn } from "@/lib/utils";
 import { uploadAccountMedia, MEDIA_MAX_BYTES } from "@/lib/storage/upload-media";
 import { slugify, type BuilderNode } from "../shared";
 import { NextNodeRow, NodeKeySelect, TextRow } from "./fields";
+import { BASE_PATH } from "@/lib/base-path";
 
 interface NodeConfigFormProps {
   node: BuilderNode;
@@ -847,7 +848,7 @@ function useUserTags(): UserTag[] {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch("/api/tags").catch(() => null);
+        const res = await fetch(`${BASE_PATH}/api/tags`).catch(() => null);
         if (!res || !res.ok) return;
         const json = (await res.json()) as { tags?: UserTag[] };
         if (!cancelled) setTags(json.tags ?? []);

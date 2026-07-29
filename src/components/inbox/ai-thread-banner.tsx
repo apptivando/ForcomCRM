@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/hooks/use-auth";
+import { BASE_PATH } from "@/lib/base-path";
 
 // ------------------------------------------------------------
 // Account AI status is the same for every conversation, so cache it per
@@ -27,7 +28,7 @@ async function fetchAiAccountStatus(accountId: string): Promise<AiAccountStatus>
   const cached = statusCache.get(accountId);
   if (cached) return cached;
   try {
-    const res = await fetch("/api/ai/config", { cache: "no-store" });
+    const res = await fetch(`${BASE_PATH}/api/ai/config`, { cache: "no-store" });
     if (!res.ok) return { autoReplyOn: false }; // don't cache a transient failure
     const j = await res.json();
     const status = {
@@ -101,7 +102,7 @@ export function AiThreadBanner({
     async (paused: boolean) => {
       setBusy(true);
       try {
-        const res = await fetch(`/api/ai/autoreply/${conversationId}`, {
+        const res = await fetch(`${BASE_PATH}/api/ai/autoreply/${conversationId}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           // "Take over" also assigns the thread to the acting agent.

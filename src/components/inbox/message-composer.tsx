@@ -53,6 +53,7 @@ import {
   blankButtonsPayload,
 } from "@/components/interactive/interactive-builder";
 import { validateInteractivePayload } from "@/lib/whatsapp/interactive";
+import { BASE_PATH } from "@/lib/base-path";
 import type { InteractiveMessagePayload, QuickReply } from "@/types";
 import { QuickReplyPicker } from "./quick-reply-picker";
 
@@ -261,7 +262,7 @@ export function MessageComposer({
     if (drafting) return;
     setDrafting(true);
     try {
-      const res = await fetch("/api/ai/draft", {
+      const res = await fetch(`${BASE_PATH}/api/ai/draft`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ conversation_id: conversationId }),
@@ -332,7 +333,7 @@ export function MessageComposer({
     if (!title) return;
     setSavingQuickReply(true);
     try {
-      const res = await fetch("/api/quick-replies", {
+      const res = await fetch(`${BASE_PATH}/api/quick-replies`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

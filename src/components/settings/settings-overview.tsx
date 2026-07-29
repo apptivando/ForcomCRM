@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils';
 import { SECTION_META, type SettingsSection } from './settings-sections';
 import { SettingsChip, StatusDot } from './settings-chip';
 import { ROLE_META } from './role-meta';
+import { BASE_PATH } from '@/lib/base-path';
 
 interface OverviewCounts {
   members: number | null;
@@ -64,9 +65,9 @@ export function SettingsOverview({
       setCountsLoading(true);
       const [membersRes, invitesRes, templatesTotal, templatesPending, tagsRes, fieldsRes] =
         await Promise.allSettled([
-          fetch('/api/account/members', { cache: 'no-store' }).then((r) => r.json()),
+          fetch(`${BASE_PATH}/api/account/members`, { cache: 'no-store' }).then((r) => r.json()),
           canManageMembers
-            ? fetch('/api/account/invitations', { cache: 'no-store' }).then((r) =>
+            ? fetch(`${BASE_PATH}/api/account/invitations`, { cache: 'no-store' }).then((r) =>
                 r.json(),
               )
             : Promise.resolve(null),
@@ -126,7 +127,7 @@ export function SettingsOverview({
           .select('phone_number_id')
           .eq('account_id', acctId)
           .maybeSingle(),
-        fetch('/api/whatsapp/config', { cache: 'no-store' }).then((r) => r.json()),
+        fetch(`${BASE_PATH}/api/whatsapp/config`, { cache: 'no-store' }).then((r) => r.json()),
       ]);
       if (cancelled) return;
       setWhatsapp({

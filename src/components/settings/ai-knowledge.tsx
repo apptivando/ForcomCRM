@@ -15,6 +15,7 @@ import {
   CardDescription,
 } from '@/components/ui/card';
 import { useTranslations } from 'next-intl';
+import { BASE_PATH } from '@/lib/base-path';
 
 interface DocSummary {
   id: string;
@@ -47,7 +48,7 @@ export function AiKnowledgeCard({
   const fetchDocs = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/ai/knowledge');
+      const res = await fetch(`${BASE_PATH}/api/ai/knowledge`);
       const data = await res.json();
       if (res.ok) setDocs(data.documents ?? []);
       else toast.error(data.error ?? t('loadFailed'));
@@ -72,7 +73,7 @@ export function AiKnowledgeCard({
 
   const openEdit = async (id: string) => {
     try {
-      const res = await fetch(`/api/ai/knowledge/${id}`);
+      const res = await fetch(`${BASE_PATH}/api/ai/knowledge/${id}`);
       const data = await res.json();
       if (!res.ok) {
         toast.error(data.error ?? t('openFailed'));
@@ -101,7 +102,7 @@ export function AiKnowledgeCard({
     try {
       const isNew = editing === 'new';
       const res = await fetch(
-        isNew ? '/api/ai/knowledge' : `/api/ai/knowledge/${editing}`,
+        isNew ? `${BASE_PATH}/api/ai/knowledge` : `${BASE_PATH}/api/ai/knowledge/${editing}`,
         {
           method: isNew ? 'POST' : 'PATCH',
           headers: { 'Content-Type': 'application/json' },
@@ -127,7 +128,7 @@ export function AiKnowledgeCard({
 
   const remove = async (id: string) => {
     try {
-      const res = await fetch(`/api/ai/knowledge/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${BASE_PATH}/api/ai/knowledge/${id}`, { method: 'DELETE' });
       if (res.ok) {
         toast.success(t('removeSuccess'));
         setDocs((d) => d.filter((x) => x.id !== id));
@@ -143,7 +144,7 @@ export function AiKnowledgeCard({
   const reindex = async () => {
     setReindexing(true);
     try {
-      const res = await fetch('/api/ai/knowledge/reindex', { method: 'POST' });
+      const res = await fetch(`${BASE_PATH}/api/ai/knowledge/reindex`, { method: 'POST' });
       const data = await res.json();
       if (res.ok && data.success) {
         toast.success(t('reindexSuccess', { count: data.reindexed }));

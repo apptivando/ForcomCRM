@@ -21,6 +21,7 @@ import { useTranslations } from "next-intl";
 
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { BASE_PATH } from "@/lib/base-path";
 
 /**
  * Run history viewer.
@@ -113,7 +114,7 @@ export default function FlowRunsPage() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`/api/flows/${params.id}/runs`);
+        const res = await fetch(`${BASE_PATH}/api/flows/${params.id}/runs`);
         if (res.status === 404) {
           if (!cancelled) setNotFound(true);
           return;

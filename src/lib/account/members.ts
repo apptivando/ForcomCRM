@@ -1,4 +1,5 @@
 import type { AccountMember } from '@/types';
+import { BASE_PATH } from '@/lib/base-path';
 
 /**
  * Fetch the current account's members from the API (which applies the
@@ -10,7 +11,7 @@ import type { AccountMember } from '@/types';
  */
 export async function fetchAccountMembers(): Promise<AccountMember[]> {
   try {
-    const res = await fetch('/api/account/members', { cache: 'no-store' });
+    const res = await fetch(`${BASE_PATH}/api/account/members`, { cache: 'no-store' });
     if (!res.ok) return [];
     const json = (await res.json()) as { members?: AccountMember[] };
     return json.members ?? [];

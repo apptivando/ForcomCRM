@@ -8,6 +8,7 @@ import { AiUsageCard } from '@/components/agents/ai-usage';
 import { AiConfig } from '@/components/settings/ai-config';
 import { useAuth } from '@/hooks/use-auth';
 import { canEditSettings } from '@/lib/auth/roles';
+import { BASE_PATH } from '@/lib/base-path';
 
 type Tab = 'playground' | 'setup' | 'usage';
 
@@ -22,7 +23,7 @@ export default function AgentsPage() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch('/api/ai/config');
+        const res = await fetch(`${BASE_PATH}/api/ai/config`);
         const data = await res.json().catch(() => ({}));
         if (!cancelled) setTab(data?.configured ? 'playground' : 'setup');
       } catch {

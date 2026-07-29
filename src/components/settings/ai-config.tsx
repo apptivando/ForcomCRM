@@ -30,6 +30,7 @@ import { AI_PROVIDER_DEFAULT_MODEL } from '@/lib/ai/defaults';
 import type { AiProvider } from '@/lib/ai/types';
 import type { AccountMember } from '@/types';
 import { fetchAccountMembers, memberLabel } from '@/lib/account/members';
+import { BASE_PATH } from '@/lib/base-path';
 import { useTranslations } from 'next-intl';
 
 const MASKED_KEY = '••••••••••••••••';
@@ -85,7 +86,7 @@ export function AiConfig() {
   const fetchConfig = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/ai/config');
+      const res = await fetch(`${BASE_PATH}/api/ai/config`);
       const data = await res.json();
       if (!res.ok) {
         toast.error(data.error ?? t('loadFailed'));
@@ -156,7 +157,7 @@ export function AiConfig() {
   const handleTest = async () => {
     setTesting(true);
     try {
-      const res = await fetch('/api/ai/test', {
+      const res = await fetch(`${BASE_PATH}/api/ai/test`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -186,7 +187,7 @@ export function AiConfig() {
     }
     setSaving(true);
     try {
-      const res = await fetch('/api/ai/config', {
+      const res = await fetch(`${BASE_PATH}/api/ai/config`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(buildBody()),
@@ -208,7 +209,7 @@ export function AiConfig() {
   const handleRemove = async () => {
     setRemoving(true);
     try {
-      const res = await fetch('/api/ai/config', { method: 'DELETE' });
+      const res = await fetch(`${BASE_PATH}/api/ai/config`, { method: 'DELETE' });
       if (res.ok) {
         toast.success(t('removeSuccess'));
         setConfigured(false);

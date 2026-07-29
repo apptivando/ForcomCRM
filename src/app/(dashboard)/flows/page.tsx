@@ -33,6 +33,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { BASE_PATH } from "@/lib/base-path";
 
 /**
  * Flows list page.
@@ -98,8 +99,8 @@ export default function FlowsPage() {
     (async () => {
       try {
         const [flowsRes, tmplRes] = await Promise.all([
-          fetch("/api/flows"),
-          fetch("/api/flows/templates"),
+          fetch(`${BASE_PATH}/api/flows`),
+          fetch(`${BASE_PATH}/api/flows/templates`),
         ]);
         if (!flowsRes.ok) {
           throw new Error(`Failed to load flows: ${flowsRes.status}`);
@@ -132,7 +133,7 @@ export default function FlowsPage() {
     if (!newName.trim()) return;
     setCreating(true);
     try {
-      const res = await fetch("/api/flows", {
+      const res = await fetch(`${BASE_PATH}/api/flows`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -157,7 +158,7 @@ export default function FlowsPage() {
   async function handleUseTemplate(slug: string) {
     setCreating(true);
     try {
-      const res = await fetch("/api/flows", {
+      const res = await fetch(`${BASE_PATH}/api/flows`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ template_slug: slug }),
@@ -181,7 +182,7 @@ export default function FlowsPage() {
     const yes = window.confirm(t("deleteConfirm", { name: flow.name }));
     if (!yes) return;
     try {
-      const res = await fetch(`/api/flows/${flow.id}`, { method: "DELETE" });
+      const res = await fetch(`${BASE_PATH}/api/flows/${flow.id}`, { method: "DELETE" });
       if (!res.ok) throw new Error(`Delete failed: ${res.status}`);
       setFlows((prev) => prev.filter((f) => f.id !== flow.id));
       toast.success(t("deleteSuccess"));

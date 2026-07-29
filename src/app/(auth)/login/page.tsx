@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
+import { BASE_PATH } from "@/lib/base-path";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -69,8 +70,8 @@ function LoginPageInner() {
     // instead of signing in (issue #365). Mirrors the deliberate full
     // reload the invite-accept flow already uses in join/[token].
     const destination = inviteToken
-      ? `/join/${encodeURIComponent(inviteToken)}`
-      : "/dashboard";
+      ? `${BASE_PATH}/join/${encodeURIComponent(inviteToken)}`
+      : `${BASE_PATH}/dashboard`;
     window.location.href = destination;
   };
 

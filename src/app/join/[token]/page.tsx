@@ -52,6 +52,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { createClient } from '@/lib/supabase/client';
+import { BASE_PATH } from '@/lib/base-path';
 
 interface PeekOk {
   ok: true;
@@ -117,7 +118,7 @@ export default function JoinPage() {
     setAuthedUserId(undefined);
     try {
       const [peekRes, authRes] = await Promise.all([
-        fetch(`/api/invitations/${encodeURIComponent(token)}/peek`, {
+        fetch(`${BASE_PATH}/api/invitations/${encodeURIComponent(token)}/peek`, {
           cache: 'no-store',
         }),
         createClient().auth.getUser(),
@@ -142,7 +143,7 @@ export default function JoinPage() {
     (async () => {
       try {
         const [peekRes, authRes] = await Promise.all([
-          fetch(`/api/invitations/${encodeURIComponent(token)}/peek`, {
+          fetch(`${BASE_PATH}/api/invitations/${encodeURIComponent(token)}/peek`, {
             cache: 'no-store',
           }),
           createClient().auth.getUser(),
@@ -168,7 +169,7 @@ export default function JoinPage() {
     setAccepting(true);
     try {
       const res = await fetch(
-        `/api/invitations/${encodeURIComponent(token)}/redeem`,
+        `${BASE_PATH}/api/invitations/${encodeURIComponent(token)}/redeem`,
         { method: 'POST' },
       );
       if (!res.ok) {
@@ -194,7 +195,7 @@ export default function JoinPage() {
       toast.success('Welcome to the team');
       // Full reload (not router.push) so AuthProvider re-fetches
       // the profile with the new account_id and account_role.
-      window.location.href = '/dashboard';
+      window.location.href = `${BASE_PATH}/dashboard`;
     } catch (err) {
       console.error('[join] redeem error:', err);
       toast.error('Could not reach the server');

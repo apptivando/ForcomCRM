@@ -12,6 +12,7 @@ import {
   type ServerStepNode,
 } from "@/components/automations/automation-builder"
 import type { AutomationTriggerType } from "@/types"
+import { BASE_PATH } from "@/lib/base-path"
 
 export default function EditAutomationPage({
   params,
@@ -27,7 +28,7 @@ export default function EditAutomationPage({
   useEffect(() => {
     let cancelled = false
     async function load() {
-      const res = await fetch(`/api/automations/${id}`)
+      const res = await fetch(`${BASE_PATH}/api/automations/${id}`)
       if (!res.ok) {
         if (!cancelled) setError(t("loadError", { status: res.status }))
         return

@@ -9,6 +9,7 @@ import { useTranslations } from "next-intl";
 
 import { FlowEditorShell } from "@/components/flows/flow-editor-shell";
 import type { FlowRow, FlowNodeRow } from "@/lib/flows/types";
+import { BASE_PATH } from "@/lib/base-path";
 
 /**
  * Flow editor shell.
@@ -37,7 +38,7 @@ export default function FlowEditorPage() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`/api/flows/${params.id}`);
+        const res = await fetch(`${BASE_PATH}/api/flows/${params.id}`);
         if (res.status === 404) {
           if (!cancelled) setNotFound(true);
           return;

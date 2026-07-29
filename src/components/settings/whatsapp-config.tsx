@@ -30,6 +30,7 @@ import {
   AccordionContent,
 } from '@/components/ui/accordion';
 import type { WhatsAppConfig as WhatsAppConfigType } from '@/types';
+import { BASE_PATH } from '@/lib/base-path';
 
 const MASKED_TOKEN = '••••••••••••••••';
 
@@ -136,7 +137,7 @@ export function WhatsAppConfig() {
       // Then verify health via the API (decrypts token + pings Meta)
       if (data) {
         try {
-          const res = await fetch('/api/whatsapp/config', { method: 'GET' });
+          const res = await fetch(`${BASE_PATH}/api/whatsapp/config`, { method: 'GET' });
           const payload = await res.json();
 
           if (payload.connected) {
@@ -221,7 +222,7 @@ export function WhatsAppConfig() {
         return;
       }
 
-      const res = await fetch('/api/whatsapp/config', {
+      const res = await fetch(`${BASE_PATH}/api/whatsapp/config`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -280,7 +281,7 @@ export function WhatsAppConfig() {
   async function handleTestConnection() {
     try {
       setTesting(true);
-      const res = await fetch('/api/whatsapp/config', { method: 'GET' });
+      const res = await fetch(`${BASE_PATH}/api/whatsapp/config`, { method: 'GET' });
       const payload = await res.json();
 
       if (payload.connected) {
@@ -311,7 +312,7 @@ export function WhatsAppConfig() {
     setVerifyingRegistration(true);
     setRegistrationProbe(null);
     try {
-      const res = await fetch('/api/whatsapp/config/verify-registration', {
+      const res = await fetch(`${BASE_PATH}/api/whatsapp/config/verify-registration`, {
         method: 'GET',
       });
       const data = (await res.json()) as RegistrationProbe;
@@ -340,7 +341,7 @@ export function WhatsAppConfig() {
 
     try {
       setResetting(true);
-      const res = await fetch('/api/whatsapp/config', { method: 'DELETE' });
+      const res = await fetch(`${BASE_PATH}/api/whatsapp/config`, { method: 'DELETE' });
       const data = await res.json();
 
       if (!res.ok) {

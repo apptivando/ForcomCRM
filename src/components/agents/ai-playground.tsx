@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Bot, RotateCcw, Send, Loader2, UserCircle2, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { BASE_PATH } from '@/lib/base-path';
 
 interface Turn {
   role: 'user' | 'assistant';
@@ -32,7 +33,7 @@ export function AiPlayground({ onGoToSetup }: { onGoToSetup?: () => void }) {
     setInput('');
     setSending(true);
     try {
-      const res = await fetch('/api/ai/playground', {
+      const res = await fetch(`${BASE_PATH}/api/ai/playground`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         // Send only role+content — the server ignores anything else.

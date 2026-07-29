@@ -75,6 +75,7 @@ import {
 import { InviteMemberDialog } from './invite-member-dialog';
 import { SettingsPanelHead } from './settings-panel-head';
 import { ROLE_META } from './role-meta';
+import { BASE_PATH } from '@/lib/base-path';
 
 interface Member {
   user_id: string;
@@ -143,9 +144,9 @@ export function MembersTab() {
   const loadEverything = useCallback(async () => {
     try {
       const [mres, ires] = await Promise.all([
-        fetch('/api/account/members', { cache: 'no-store' }),
+        fetch(`${BASE_PATH}/api/account/members`, { cache: 'no-store' }),
         canManageMembers
-          ? fetch('/api/account/invitations', { cache: 'no-store' })
+          ? fetch(`${BASE_PATH}/api/account/invitations`, { cache: 'no-store' })
           : Promise.resolve(null),
       ]);
 
@@ -193,7 +194,7 @@ export function MembersTab() {
       ),
     );
     try {
-      const res = await fetch(`/api/account/members/${member.user_id}`, {
+      const res = await fetch(`${BASE_PATH}/api/account/members/${member.user_id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ role: nextRole }),
@@ -233,7 +234,7 @@ export function MembersTab() {
     setPendingMemberAction(removingMember.user_id);
     try {
       const res = await fetch(
-        `/api/account/members/${removingMember.user_id}`,
+        `${BASE_PATH}/api/account/members/${removingMember.user_id}`,
         { method: 'DELETE' },
       );
       if (!res.ok) {
@@ -256,7 +257,7 @@ export function MembersTab() {
 
   async function handleRevoke(invite: Invitation) {
     try {
-      const res = await fetch(`/api/account/invitations/${invite.id}`, {
+      const res = await fetch(`${BASE_PATH}/api/account/invitations/${invite.id}`, {
         method: 'DELETE',
       });
       if (!res.ok) {

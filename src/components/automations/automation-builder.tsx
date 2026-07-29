@@ -63,6 +63,7 @@ import {
 import { interactivePayloadPreviewText } from "@/lib/whatsapp/interactive"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
+import { BASE_PATH } from "@/lib/base-path"
 
 // ------------------------------------------------------------
 // Types (builder-local — mirror the flattened rows we POST)
@@ -282,7 +283,7 @@ function ResourcesProvider({ children }: { children: ReactNode }) {
     // deployments → pickers fall back to a raw agent-id input.
     void (async () => {
       try {
-        const res = await fetch("/api/account/members", { cache: "no-store" })
+        const res = await fetch(`${BASE_PATH}/api/account/members`, { cache: "no-store" })
         if (!res.ok) return
         const json = (await res.json()) as { members?: AccountMember[] }
         if (!cancelled) setMembers(json.members ?? [])
@@ -673,12 +674,12 @@ export function AutomationBuilder({ initial }: { initial: BuilderInitial }) {
       }
 
       const res = isEditing
-        ? await fetch(`/api/automations/${initial.id}`, {
+        ? await fetch(`${BASE_PATH}/api/automations/${initial.id}`, {
             method: "PATCH",
             headers: { "content-type": "application/json" },
             body: JSON.stringify(payload),
           })
-        : await fetch(`/api/automations`, {
+        : await fetch(`${BASE_PATH}/api/automations`, {
             method: "POST",
             headers: { "content-type": "application/json" },
             body: JSON.stringify(payload),

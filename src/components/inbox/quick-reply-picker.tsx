@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import type { QuickReply } from "@/types";
 import { interactivePayloadPreviewText } from "@/lib/whatsapp/interactive";
+import { BASE_PATH } from "@/lib/base-path";
 
 interface QuickReplyPickerProps {
   open: boolean;
@@ -39,7 +40,7 @@ export function QuickReplyPicker({
     setLoading(true);
     void (async () => {
       try {
-        const res = await fetch("/api/quick-replies", { cache: "no-store" });
+        const res = await fetch(`${BASE_PATH}/api/quick-replies`, { cache: "no-store" });
         const data = await res.json().catch(() => ({}));
         if (!cancelled && res.ok) {
           setItems((data.quick_replies as QuickReply[]) ?? []);
