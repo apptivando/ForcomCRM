@@ -65,6 +65,14 @@ const SECURITY_HEADERS = [
 
 const nextConfig: NextConfig = {
   /**
+   * Servido detrás de un reverse proxy en forcom-web bajo
+   * forcom.tech/admin/crm — sin esto, los assets (/_next/static/...)
+   * y las rutas de API de wacrm intentarían resolverse desde la raíz
+   * del dominio y chocarían con las de forcom-web.
+   */
+  basePath: "/admin/crm",
+
+  /**
    * Cross-origin dev access (Next.js 16).
    *
    * Next 16 blocks requests to dev-only resources (`/_next/*` internals,

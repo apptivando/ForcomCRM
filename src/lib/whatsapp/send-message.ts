@@ -45,6 +45,34 @@ import {
 import type { MessageTemplate } from '@/types';
 import { isMessageTemplate } from '@/lib/whatsapp/template-row-guard';
 
+// Canal de pruebas (Track A del plan FORCOM): un `whatsapp_config` con este
+// phone_number_id sintético no habla con la Graph API real de Meta — la
+// salida se desvía a un bridge de Baileys corriendo en una notebook aparte.
+// Solo texto: el bridge no sabe manejar templates/media/interactive.
+const BAILEYS_TEST_PHONE_NUMBER_ID = 'baileys-test-01';
+
+async function sendViaBaileysBridge(to: string, text: string): Promise<string> {
+  const bridgeUrl = process.env.BAILEYS_BRIDGE_URL;
+  if (!bridgeUrl) {
+    throw new SendMessageError(
+      'bridge_not_configured',
+      'BAILEYS_BRIDGE_URL no está configurada — no se puede alcanzar el bridge de pruebas.',
+      500,
+    );
+  }
+  const res = await fetch(`${bridgeUrl}/send`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ to, text }),
+  });
+  if (!res.ok) {
+    throw new Error(`El bridge de pruebas respondió ${res.status}`);
+  }
+  // El bridge no devuelve un wamid real de Meta; usamos un id sintético
+  // para que el resto del flujo (persistencia, UI) no tenga que cambiar.
+  return `baileys-test-${Date.now()}`;
+}
+
 export const MEDIA_KINDS = ['image', 'video', 'document', 'audio'] as const;
 export const VALID_MESSAGE_TYPES = [
   'text',
@@ -330,6 +358,17 @@ export async function sendMessageToConversation(
   }
 
   const attempt = async (phone: string): Promise<string> => {
+    // Canal de pruebas: desviar al bridge de Baileys en vez de Meta.
+    if (config.phone_number_id === BAILEYS_TEST_PHONE_NUMBER_ID) {
+      if (messageType !== 'text') {
+        throw new SendMessageError(
+          'unsupported_on_test_channel',
+          'El canal de pruebas (Baileys) solo soporta mensajes de texto por ahora.',
+          400,
+        );
+      }
+      return sendViaBaileysBridge(phone, contentText!);
+    }
     if (messageType === 'template') {
       const result = await sendTemplateMessage({
         phoneNumberId: config.phone_number_id,
