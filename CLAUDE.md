@@ -36,23 +36,37 @@ El usuario no es programador — gestiona esto como dueño de FORCOM. Lenguaje n
 - **`access_token`/`verify_token` de `whatsapp_config` tienen que ser valores realmente encriptados** con `encrypt()` de `src/lib/whatsapp/encryption.ts` (AES-256-GCM, formato `iv:ciphertext:authTag`, usa `ENCRYPTION_KEY`). El webhook hace `decrypt(config.access_token)` sin try/catch alrededor a nivel de fila — un placeholder en texto plano hace que el mensaje se pierda en silencio (queda solo un log de error).
 - **Canal de pruebas Baileys ⇄ Meta:** `src/lib/whatsapp/send-message.ts` tiene un branch agregado — si `config.phone_number_id === 'baileys-test-01'`, la salida se desvía a `POST {BAILEYS_BRIDGE_URL}/send` en vez de a la Graph API real. Solo soporta `messageType === 'text'` (sin adjuntos). El webhook de entrada (`src/app/api/whatsapp/webhook/route.ts`) no tiene ningún branch — recibe el payload con forma Meta que arma y firma el bridge de Baileys tal cual, sin saber que no viene de Meta.
 - **Baileys en la notebook de pruebas necesita `7.0.0-rc14` (no la rama estable 6.x).** La rama estable (`6.7.15`, la más alta publicada) es vulnerable a CVE-2026-48063 (crítica — permite spoofear/corromper mensajes vía `placeholderResendMessage`), parchado recién en `6.7.22` (no publicada aún) o `7.0.0-rc12+`. `rc13` específicamente tenía un bug de conexión en loop infinito ("Reconectando..." sin parar) — `rc14` lo resuelve.
+- **El host de conexión directa a Postgres (`db.<ref>.supabase.co`) es IPv6-only.** Para aplicar migraciones (`supabase db push`) desde una red sin IPv6 (común en ISPs argentinos), hay que usar la cadena del **Session Pooler** (`postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres`, puerto 5432, no 6543) — la encontrás en Project Settings → Database → Connection string.
+- **Variables de entorno en Vercel: revisar el tilde de "Production".** Cuando se cargaron las variables la primera vez, `SUPABASE_SERVICE_ROLE_KEY` quedó sin marcar para Production — la app arrancaba y el login andaba igual (esa clave no se usa ahí), pero el webhook de WhatsApp fallaba en silencio (`Error: supabaseKey is required`, visible solo en Vercel → Logs, nunca en la respuesta HTTP ni en el bridge). Cualquier variable nueva o editada necesita además un **redeploy** de Production para aplicarse — Vercel no las toma solas en un deploy ya hecho.
+- **WhatsApp a veces identifica al remitente por LID en vez de por número.** `msg.key.remoteJid` puede venir como `<id-opaco>@lid` en lugar de `<telefono>@s.whatsapp.net`. Baileys expone el número real en `msg.key.remoteJidAlt` (o `participantAlt` en grupos) — el bridge (`agent1/index.js`) ya usa `participantAlt || remoteJidAlt || participant || remoteJid` (mismo orden que usa Baileys internamente en `getKeyAuthor`) antes de limpiar el sufijo `@s.whatsapp.net`/`@lid`. Sin esto, wacrm recibe un "teléfono" con forma `<id>@lid` y falla silenciosamente al crear el contacto.
+- **Puerto del bridge:** `agent1` corre con `BRIDGE_PORT=3101` (no 3001) en su `.env` — `agent2`/`agent3` (otros bots en la misma notebook, sin relación con FORCOM) compiten por el 3001 y hacían crashear a `agent1` con `EADDRINUSE` en bucle (que además corrompía la sesión de WhatsApp al matar el proceso a mitad de la conexión). Si se agrega un cuarto proceso a esa notebook, darle también un puerto propio.
+- **Cloudflare, plan gratis, no deja agregar un subdominio suelto como sitio** ("Add a site" exige el dominio raíz, ej. `forcom.tech`, rechaza `bridge.forcom.tech`). Mover todo `forcom.tech` a Cloudflare para esto tocaría los registros de mail que no queremos tocar — se descartó. Se optó por un **Quick Tunnel corriendo bajo PM2** (proceso `bridge-tunnel`, ver abajo) en vez del subdominio fijo original.
 
-## Variables de entorno (`.env.local`, no versionado)
+## Notebook de pruebas — procesos bajo PM2
 
-Ver `.env.local.example` del repo para la lista completa y comentarios. Ya configuradas en este deploy: Supabase (proyecto propio), `ENCRYPTION_KEY`, `META_APP_SECRET` (compartido con el bridge de Baileys como `BAILEYS_HMAC_SECRET`), `NEXT_PUBLIC_SITE_URL=https://forcom.tech/admin/crm`. **Pendiente:** `BAILEYS_BRIDGE_URL` sigue en un valor de relleno — depende de cerrar la decisión del túnel de Cloudflare (Track A.1 del plan, quedó pendiente entre Quick Tunnel vs. subdominio fijo).
+Todo en `~/whatsapp-agents/`, cada agente en su propia carpeta con su propio `.env`/`node_modules`. Manejados con PM2 (`pm2 list`, `pm2 logs <nombre>`, `pm2 save` después de cualquier cambio para que sobreviva reinicios):
 
-## Estado actual (29/07/2026)
+- **`agent1`** — el bridge de FORCOM (`~/whatsapp-agents/agent1/index.js`), puerto `3101`. **Siempre iniciarlo con `--cwd` explícito** (`pm2 start index.js --name agent1 --cwd ~/whatsapp-agents/agent1`) — como `auth_info` es una ruta relativa, si PM2 lo arranca desde otro directorio no encuentra la sesión guardada y pide un QR nuevo (esto pasó y rompió la sesión una vez; hubo que renombrar `auth_info` y re-vincular).
+- **`agent2`, `agent3`** — otros bots en la misma notebook, no relacionados con este proyecto. Su código interno no se revisó.
+- **`bridge-tunnel`** — `cloudflared tunnel --url http://localhost:3101` corriendo como proceso de PM2 (Quick Tunnel, ver gotcha arriba). La URL (`https://<palabras-random>.trycloudflare.com`) **cambia si este proceso se reinicia** — si eso pasa, hay que tomar la nueva URL de `pm2 logs bridge-tunnel` y actualizar `BAILEYS_BRIDGE_URL` en Vercel + redeploy.
+
+## Variables de entorno (`.env.local` en el repo / Vercel, no versionado)
+
+Ver `.env.local.example` del repo para la lista completa y comentarios. Configuradas y confirmadas funcionando en Vercel (Production): Supabase (proyecto propio), `ENCRYPTION_KEY`, `META_APP_SECRET` (= `BAILEYS_HMAC_SECRET` en el `.env` de `agent1`), `NEXT_PUBLIC_SITE_URL=https://forcom.tech/admin/crm`, `BAILEYS_BRIDGE_URL` (URL del Quick Tunnel actual — revisar que siga viva, ver gotcha de Cloudflare).
+
+`whatsapp_config` (Supabase de wacrm) ya tiene la fila del canal de pruebas: `phone_number_id='baileys-test-01'`, `account_id`/`user_id` de la cuenta real (Guillermo Reula, owner), `access_token`/`verify_token` encriptados con placeholders (no se usan de verdad, la salida real la maneja el bridge). Generados con un script Node ad-hoc que replica `encrypt()` de `src/lib/whatsapp/encryption.ts` — si hay que regenerarlos, el algoritmo es AES-256-GCM con el `ENCRYPTION_KEY` del deploy, formato `iv:ciphertext:authTag` en hex.
+
+## Estado actual (30/07/2026)
 
 ### Hecho
 - Fork creado (`apptivando/ForcomCRM`), Supabase y Vercel propios, deploy funcionando en `https://forcom-crm.vercel.app`.
-- `basePath` configurado y **todos** los casos de rutas internas rotas por eso ya corregidos (redirects + fetches) — build y typecheck limpios.
-- Cuenta admin creada (signup), login funcionando end-to-end.
-- Patch del canal de pruebas Baileys en `send-message.ts` listo (falta `BAILEYS_BRIDGE_URL` real para probarlo de punta a punta).
-- Notebook de pruebas (WSL/Ubuntu) con Tailscale + Cloudflare Tunnel instalados; `agent1` corriendo Baileys `7.0.0-rc14`, conecta OK (QR escaneado). `agent2`/`agent3` — mismo upgrade de versión aplicado, código interno (más allá de conectar) todavía sin revisar/completar.
+- **Las 36 migraciones aplicadas** (vía Session Pooler, ver gotcha). Cuenta admin completa (`accounts`/`profiles`, owner).
+- `basePath` configurado y todos los casos de rutas internas rotas por eso corregidos — build y typecheck limpios.
+- **Canal de pruebas Baileys funcionando de punta a punta, confirmado con mensajes reales**: entrada (WhatsApp → `agent1` → firma HMAC → webhook de wacrm → aparece en `/admin/crm/inbox`) y salida (responder desde el panel → `send-message.ts` → bridge `/send` → Baileys → llega al WhatsApp real) — las dos direcciones probadas y andando.
+- Notebook de pruebas con Tailscale (acceso remoto) + `agent1`/`agent2`/`agent3`/`bridge-tunnel` corriendo bajo PM2, persistente.
 
 ### Pendiente
-- Cerrar Quick Tunnel vs. subdominio fijo para `BAILEYS_BRIDGE_URL`, y con eso probar el canal de pruebas de punta a punta (mensaje real → bandeja → respuesta → sale por WhatsApp).
-- Comprar el número/SIM de prueba (FORCOM, mañana según lo último hablado).
+- Nada bloqueando el canal de pruebas — queda seguir usándolo/probándolo. Si `bridge-tunnel` se reinicia, actualizar `BAILEYS_BRIDGE_URL` (ver gotcha).
 - Track B (Meta oficial): no arrancado — cuenta de Meta Business, app en developers.facebook.com, verificación de negocio.
 - Track C (forcom-web): el rewrite `/admin/crm/*` → este deploy todavía no existe en `forcom-web/next.config.ts`; el formulario de contacto todavía no habla con la API pública de wacrm; el campo teléfono todavía no está en `Contact.tsx`.
 - Track D (RAG): sin contenido cargado — faltan las FAQs reales (garantía, envíos, formas de pago) y configurar `ai_configs` con una clave de OpenAI/Anthropic propia de la cuenta.
