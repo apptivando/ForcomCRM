@@ -65,8 +65,9 @@ Ver `.env.local.example` del repo para la lista completa y comentarios. Configur
 - **Canal de pruebas Baileys funcionando de punta a punta, confirmado con mensajes reales**: entrada (WhatsApp → `agent1` → firma HMAC → webhook de wacrm → aparece en `/admin/crm/inbox`) y salida (responder desde el panel → `send-message.ts` → bridge `/send` → Baileys → llega al WhatsApp real) — las dos direcciones probadas y andando.
 - Notebook de pruebas con Tailscale (acceso remoto) + `agent1`/`agent2`/`agent3`/`bridge-tunnel` corriendo bajo PM2, persistente.
 
+- **Manual de reactivación de la notebook** (por si se apaga/reinicia) en `docs/notebook-runbook.md`.
+
 ### Pendiente
-- Nada bloqueando el canal de pruebas — queda seguir usándolo/probándolo. Si `bridge-tunnel` se reinicia, actualizar `BAILEYS_BRIDGE_URL` (ver gotcha).
-- Track B (Meta oficial): no arrancado — cuenta de Meta Business, app en developers.facebook.com, verificación de negocio.
-- Track C (forcom-web): el rewrite `/admin/crm/*` → este deploy todavía no existe en `forcom-web/next.config.ts`; el formulario de contacto todavía no habla con la API pública de wacrm; el campo teléfono todavía no está en `Contact.tsx`.
+- **Track B (Meta oficial): a cargo del usuario, manual, sin fecha.** Es él quien tiene que crear la cuenta de Meta Business y pasar la verificación — no arranca hoy. Cuando lo retome, el resto del checklist de Track B sigue en el plan maestro.
+- **Track C (forcom-web) — empezando ahora (30/07/2026):** el rewrite `/admin/crm/*` → este deploy todavía no existe en `forcom-web/next.config.ts`; el formulario de contacto todavía no habla con la API pública de wacrm; el campo teléfono todavía no está en `Contact.tsx`. Ver `forcom-web/CLAUDE.md` para el trabajo de este lado.
 - Track D (RAG): sin contenido cargado — faltan las FAQs reales (garantía, envíos, formas de pago) y configurar `ai_configs` con una clave de OpenAI/Anthropic propia de la cuenta.
