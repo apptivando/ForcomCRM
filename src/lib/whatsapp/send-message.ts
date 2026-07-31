@@ -49,9 +49,9 @@ import { isMessageTemplate } from '@/lib/whatsapp/template-row-guard';
 // phone_number_id sintético no habla con la Graph API real de Meta — la
 // salida se desvía a un bridge de Baileys corriendo en una notebook aparte.
 // Solo texto: el bridge no sabe manejar templates/media/interactive.
-const BAILEYS_TEST_PHONE_NUMBER_ID = 'baileys-test-01';
+export const BAILEYS_TEST_PHONE_NUMBER_ID = 'baileys-test-01';
 
-async function sendViaBaileysBridge(to: string, text: string): Promise<string> {
+export async function sendViaBaileysBridge(to: string, text: string): Promise<string> {
   const bridgeUrl = process.env.BAILEYS_BRIDGE_URL;
   if (!bridgeUrl) {
     throw new SendMessageError(
