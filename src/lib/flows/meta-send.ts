@@ -7,6 +7,10 @@ import {
   type InteractiveListSection,
   type MediaKind,
 } from '@/lib/whatsapp/meta-api'
+import {
+  BAILEYS_TEST_PHONE_NUMBER_ID,
+  sendViaBaileysBridge,
+} from '@/lib/whatsapp/send-message'
 import type { InteractiveMessagePayload } from '@/lib/whatsapp/interactive'
 import { decrypt } from '@/lib/whatsapp/encryption'
 import {
@@ -94,6 +98,10 @@ export async function engineSendText(
   const accessToken = decrypt(config.access_token)
 
   const attempt = async (phone: string): Promise<string> => {
+    // Canal de pruebas (Track A): desviar al bridge de Baileys en vez de Meta.
+    if (config.phone_number_id === BAILEYS_TEST_PHONE_NUMBER_ID) {
+      return sendViaBaileysBridge(phone, args.text)
+    }
     const r = await sendTextMessage({
       phoneNumberId: config.phone_number_id,
       accessToken,

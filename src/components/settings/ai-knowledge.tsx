@@ -209,7 +209,7 @@ export function AiKnowledgeCard({
                           size="sm"
                           className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                           onClick={() => void remove(doc.id)}
-                          title="Delete"
+                          title={t("deleteAria")}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>

@@ -9,7 +9,10 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  /* Barlow Condensed, loaded in layout.tsx — FORCOM's display face.
+   * Applied by the shadcn Card / Dialog / Sheet / Alert titles via the
+   * `font-heading` utility, and by the page <h1>s in app-heading. */
+  --font-heading: var(--font-barlow-condensed);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -86,34 +89,40 @@
 
 /* ---- MODE: neutral surfaces ---- */
 
+/* Dark-mode neutrals are FORCOM's, converted from the hex palette in
+ * forcom-web's globals.css so the CRM and forcom.tech read as one
+ * product: #0D0D0F page, #141416 sidebar, #1A1A1E cards, #202024 the
+ * raised tile, #2A2A2E borders, #8A8A8A muted copy. The old values
+ * were blue-tinted slate (hue 260); FORCOM's greys are near-neutral
+ * (hue ~286, chroma ≤ 0.008), which is what lets the red pop. */
 :root,
 html[data-mode="dark"] {
-  --background: oklch(0.13 0.01 260);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.18 0.01 260);
-  --card-2: oklch(0.205 0.01 260);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.18 0.01 260);
-  --popover-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.22 0.01 260);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.22 0.01 260);
-  --muted-foreground: oklch(0.65 0.01 260);
-  --accent: oklch(0.22 0.01 260);
-  --accent-foreground: oklch(0.985 0 0);
+  --background: oklch(0.16 0.004 286);
+  --foreground: oklch(1 0 0);
+  --card: oklch(0.22 0.008 286);
+  --card-2: oklch(0.245 0.008 286);
+  --card-foreground: oklch(1 0 0);
+  --popover: oklch(0.22 0.008 286);
+  --popover-foreground: oklch(1 0 0);
+  --secondary: oklch(0.245 0.008 286);
+  --secondary-foreground: oklch(1 0 0);
+  --muted: oklch(0.245 0.008 286);
+  --muted-foreground: oklch(0.633 0.004 286);
+  --accent: oklch(0.245 0.008 286);
+  --accent-foreground: oklch(1 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.28 0.01 260);
-  --input: oklch(0.28 0.01 260);
+  --border: oklch(0.287 0.007 286);
+  --input: oklch(0.287 0.007 286);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
-  --sidebar: oklch(0.16 0.01 260);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.22 0.01 260);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.28 0.01 260);
+  --sidebar: oklch(0.192 0.004 286);
+  --sidebar-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.245 0.008 286);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(0.287 0.007 286);
 }
 
 html[data-mode="light"] {
@@ -147,7 +156,24 @@ html[data-mode="light"] {
 
 /* ---- ACCENT: primary color ---- */
 
+/* FORCOM brand red (#E8231A) — the default accent. Hover is the
+ * lighter #F04A42 rather than forcom-web's darker #C41D16, because
+ * every other accent in this file brightens on hover and the shared
+ * button styles assume that direction. */
 :root,
+html[data-theme="forcom"] {
+  --primary: oklch(0.596 0.228 29.1);
+  --primary-foreground: oklch(1 0 0);
+  --primary-hover: oklch(0.644 0.204 27.2);
+  --primary-soft: oklch(0.596 0.228 29.1 / 0.12);
+  --primary-soft-2: oklch(0.596 0.228 29.1 / 0.22);
+  --ring: oklch(0.596 0.228 29.1);
+  --chart-1: oklch(0.596 0.228 29.1);
+  --sidebar-primary: oklch(0.596 0.228 29.1);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-ring: oklch(0.596 0.228 29.1);
+}
+
 html[data-theme="violet"] {
   --primary: oklch(0.526 0.247 293);
   --primary-foreground: oklch(0.985 0 0);

@@ -28,6 +28,16 @@ El usuario no es programador — gestiona esto como dueño de FORCOM. Lenguaje n
 - **`forcom-web` todavía NO tiene el rewrite configurado** (Track C del plan, pendiente) — por ahora se accede directo a la URL de Vercel: `https://forcom-crm.vercel.app/admin/crm/...` (la raíz `/` sin el basePath da 404 a propósito).
 - **Dos proyectos separados, un solo GitHub repo:** Supabase y Vercel son cuentas/proyectos propios de este fork, distintos a los de forcom-web.
 
+## Idioma e identidad visual
+
+- **La app corre en español.** El idioma sale de `src/i18n/request.ts`, que lee `NEXT_PUBLIC_APP_LOCALE` y **por defecto usa `es`** — no hace falta cargar la variable en Vercel. Todos los textos viven en `messages/es.json` (par exacto de `messages/en.json`; `ko.json` es del upstream y no lo mantenemos). Tono: **voseo argentino** ("Escribí", "¿Querés eliminar…?").
+- **Texto nuevo va siempre al diccionario, nunca escrito a mano en el componente.** Se usa `useTranslations("<Namespace>")` y `t("clave")`. Hay un script de verificación en el historial que recorre todos los `t(...)` y confirma que cada clave exista en `en` y `es` — si agregás una clave, agregala a los tres archivos de `messages/`.
+- **Las fechas también se traducen.** date-fns tiene su propio registro de idiomas y por defecto sale en inglés ("2 hours ago"). Todo `format` / `formatDistanceToNow` tiene que recibir `{ locale: DATE_LOCALE }` de `@/lib/date-locale`.
+- **Tema FORCOM.** `src/lib/themes.ts` tiene `DEFAULT_THEME = "forcom"` y `src/app/globals.css` define `html[data-theme="forcom"]` con el rojo de marca `#E8231A` (+ hover `#F04A42`). Los neutros del modo oscuro son la paleta exacta de forcom-web (`#0D0D0F` fondo, `#141416` menú lateral, `#1A1A1E` tarjetas, `#2A2A2E` bordes). Están escritos en oklch para no romper el estilo del archivo, pero compilan a esos hex exactos.
+- **El acento es por dispositivo, no por cuenta.** Se guarda en `localStorage` (`wacrm.theme`) y **solo se escribe cuando alguien elige uno a mano** en Ajustes → Apariencia. Si un navegador ya tenía "violet" guardado de antes, va a seguir en violeta hasta que elija FORCOM ahí; los navegadores nuevos arrancan en FORCOM.
+- **Tipografías:** Barlow Condensed (títulos, vía la utilidad `font-heading`) + DM Sans (cuerpo, `--font-sans`), las mismas de forcom.tech. Se cargan en `src/app/layout.tsx`.
+- **El logotipo es texto, no una imagen:** `src/components/layout/brand-mark.tsx` arma "FOR" en `text-primary` + "COM" en `text-foreground`. Lo usan el menú lateral y todas las pantallas de acceso (login / registro / recuperar contraseña / invitación).
+
 ## Gotchas críticos
 
 - **`basePath` no es automático para todo.** Next.js ajusta solo `<Link>`, `useRouter()`, `redirect()` de `next/navigation` y los assets de `/_next/*`. **NO ajusta** `window.location.href = "/algo"` ni `fetch("/api/...")` del lado del cliente — encontramos y corregimos **5 redirecciones de página completa + 30 archivos con fetch interno** (commit `caef50a`) que usaban rutas absolutas sin el prefijo. Cualquier código nuevo que redirija con `window.location` o pegue a `/api/...` desde un componente cliente **tiene que** anteponer `BASE_PATH` (importado de `@/lib/base-path`). Las llamadas a servicios externos (Meta Graph API, OpenAI, Anthropic, webhooks salientes) NO llevan el prefijo — son URLs absolutas externas.
@@ -67,6 +77,7 @@ Ver `.env.local.example` del repo para la lista completa y comentarios. Configur
 - Notebook de pruebas con Tailscale (acceso remoto) + `agent1`/`agent2`/`agent3`/`bridge-tunnel` corriendo bajo PM2, persistente.
 
 - **Manual de reactivación de la notebook** (por si se apaga/reinicia) en `docs/notebook-runbook.md`.
+- **Panel en español y con identidad FORCOM (30/07/2026).** Diccionario `messages/es.json` completo, todas las pantallas que tenían texto en inglés a mano pasadas al diccionario, fechas localizadas, tema rojo/negro de marca por defecto, tipografías Barlow Condensed + DM Sans, logotipo FORCOM y favicon propios, y "wacrm" reemplazado por "FORCOM CRM" en los textos visibles. Ver la sección "Idioma e identidad visual" arriba.
 
 ### Pendiente
 - **Track B (Meta oficial): a cargo del usuario, manual, sin fecha.** Es él quien tiene que crear la cuenta de Meta Business y pasar la verificación — no arranca hoy. Cuando lo retome, el resto del checklist de Track B sigue en el plan maestro.
