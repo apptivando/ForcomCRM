@@ -131,7 +131,10 @@ function getBaseUrl(request: Request): string {
       "[POST /api/account/invitations] could not derive base URL from request; falling back to marketing domain",
     );
   }
-  return "https://wacrm.tech";
+  // Last-resort fallback: this fork's canonical public URL. In practice
+  // `NEXT_PUBLIC_SITE_URL` is set on the deploy, so this only fires if
+  // that's missing AND the request host can't be trusted.
+  return "https://forcom.tech/admin/crm";
 }
 
 const MAX_LABEL_LEN = 80;

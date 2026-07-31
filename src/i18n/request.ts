@@ -1,8 +1,10 @@
 import { getRequestConfig } from 'next-intl/server';
 
 export default getRequestConfig(async () => {
-  // Read the locale from the environment, defaulting to 'en'
-  const locale = process.env.NEXT_PUBLIC_APP_LOCALE || 'en';
+  // Read the locale from the environment. FORCOM runs the panel in
+  // Spanish (messages/es.json), so that's the default here — set
+  // NEXT_PUBLIC_APP_LOCALE to override per-deploy without a code change.
+  const locale = process.env.NEXT_PUBLIC_APP_LOCALE || 'es';
 
   let messages;
   try {

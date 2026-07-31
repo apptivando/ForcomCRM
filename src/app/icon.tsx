@@ -1,9 +1,9 @@
 import { ImageResponse } from "next/og";
 
-// Replaces the default Next.js favicon with the brand mark — Hostinger
-// violet rounded square + white chat-square glyph — matching the
-// sidebar logo in `src/components/layout/sidebar.tsx`. Next.js renders
-// this at build time and auto-injects <link rel="icon"> into <head>.
+// Browser-tab mark — FORCOM red rounded square with a white "F",
+// matching the sidebar logo in `src/components/layout/sidebar.tsx` and
+// the red of the wordmark on forcom.tech. Next.js renders this at
+// build time and auto-injects <link rel="icon"> into <head>.
 //
 // This route takes precedence over src/app/favicon.ico, which is the
 // Next.js default and can stay on disk harmlessly (or be removed).
@@ -22,22 +22,18 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#7c3aed", // primary (Hostinger-aligned purple)
+          background: "#E8231A", // --primary — FORCOM brand red
           borderRadius: 6,
+          color: "#ffffff",
+          fontSize: 23,
+          fontWeight: 700,
+          lineHeight: 1,
+          // The glyph's optical centre sits a hair below the box's
+          // geometric centre at 32px; nudge it back up.
+          paddingBottom: 2,
         }}
       >
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="#ffffff"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        </svg>
+        F
       </div>
     ),
     { ...size },
